@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+set -eu
+
+gcp_project_id=${1:?'set GCP project name as first argument'}
+gcp_project_number=${2:?'set GCP project number as second argument'}
+gcs_buckect_name_for_tfstate=${3:?'set GCS Bucket name as third argument'}
+
+
+rm -rf .terraform
+
+terraform init -backend-config="bucket=${gcs_buckect_name_for_tfstate}"
+
+terraform refresh \
+  -var="gcp_project_id=${gcp_project_id}" \
+  -var="gcp_project_number=${gcp_project_number}"
+  
+terraform destroy -refresh=true \
+  -auto-approve \
+  -var="gcp_project_id=${gcp_project_id}" \
+  -var="gcp_project_number=${gcp_project_number}"
